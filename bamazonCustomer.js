@@ -38,3 +38,109 @@ function display() {
         start();
     })
 }
+
+function start() {
+    inquirer.prompt([
+        {
+            type: 'input',
+            name: 'id',
+            message: 'What is the ITEM_ID of the product you would like to buy?',
+            validate: (answer) => {
+                // Inquirer preferred way with promise to validate value
+                return new Promise((resolve, reject) => {
+                    connection.query('SELECT item_id FROM products', (err, res) => {
+                        if (err) throw err;
+                        let flag = false;
+                        for (let i in res) {
+                            if (res[i].item_id == answer) {
+                                flag = true;
+                                break;
+                            }
+                        }
+                        if (flag) {
+                            resolve(true);
+                        }
+                        else {
+                            reject('ITEM_ID does not exist');
+                        }
+                    })
+                })
+            }
+        },
+        {
+            type: 'input',
+            name: 'quantity',
+            message: 'How many units would you like?',
+            validate: (answer) => {
+                let input = answer;
+                return new Promise((resolve, reject) => {
+                    let check = isNaN(input);
+                    let flag = false;
+                    if (check) {
+                        flag = false;
+                    }
+                    else {
+                        flag = true;
+                    }
+
+                    if (flag) {
+                        resolve(true);
+                    }
+                    else {
+                        reject('Not a valid quantity');
+                    }
+                })
+            }
+        }
+    ]).then((answer) => {
+        // let oldStock = 0;
+        // let newStock = 0;
+        // let oldPurchased = 0;
+        // let purchased = 0;
+        // let id;
+        connection.query('SELECT * FROM products WHERE ?',
+            {
+                item_id: answer.id
+            },
+            (err, results, fields) => {
+                if (err) throw err;
+                let oldStock = results[0].stock_quantity;
+                let newStock = oldStock - answer.quantity;
+                let oldPurchased = results[0].product_sales;
+                let purchased = answer.quantity * results[0].price;
+                if (newStock > -1) {
+                    connection.query('UPDATE products SET ? WHERE ?',
+                        [{
+                            stock_quantity: newStock
+                        },
+                        {
+                            item_id: answer.id
+                        }],
+                        (err, results, fields) => {
+                            if (err) throw err;
+                            console.log('Item purchased!')
+                            let newPurchased = parseInt(oldPurchased) + parseInt(purchased);
+                            connection.query('UPDATE products SET ? WHERE ?',
+                                [{
+                                    product_sales: newPurchased
+                                },
+                                {
+                                    item_id: answer.id
+                                }],
+                                (err, results, fields) => {
+                                    if (err) throw err;
+                                    console.log('Sales Updated');
+                                    display();
+                                }
+                            )
+                        }
+                    )
+                }
+                else {
+                    console.log('Insufficient quantity!');
+                    display();
+                }
+            }
+        )
+    });
+}
