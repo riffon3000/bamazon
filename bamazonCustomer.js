@@ -93,11 +93,6 @@ function start() {
             }
         }
     ]).then((answer) => {
-        // let oldStock = 0;
-        // let newStock = 0;
-        // let oldPurchased = 0;
-        // let purchased = 0;
-        // let id;
         connection.query('SELECT * FROM products WHERE ?',
             {
                 item_id: answer.id
@@ -108,7 +103,7 @@ function start() {
                 let newStock = oldStock - answer.quantity;
                 let oldPurchased = results[0].product_sales;
                 let purchased = answer.quantity * results[0].price;
-                if (newStock > -1) {
+                if (newStock > 0) {
                     connection.query('UPDATE products SET ? WHERE ?',
                         [{
                             stock_quantity: newStock
