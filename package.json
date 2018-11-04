@@ -1,0 +1,26 @@
+{
+  "name": "bamazon",
+  "version": "1.0.0",
+  "description": "Node.js & MySQL",
+  "main": "bamazonCustomer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/riffon3000/bamazon.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/riffon3000/bamazon/issues"
+  },
+  "homepage": "https://github.com/riffon3000/bamazon#readme",
+  "dependencies": {
+    "console.table": "^0.10.0",
+    "dotenv": "^6.1.0",
+    "inquirer": "^6.2.0",
+    "mysql": "^2.16.0"
+  }
+}
