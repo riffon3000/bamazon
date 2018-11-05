@@ -7,13 +7,11 @@ CREATE TABLE products (
   item_id INT NOT NULL AUTO_INCREMENT,
   product_name VARCHAR(100) NOT NULL,
   department_name VARCHAR(45) NOT NULL,
-  price DEC(10,2) NOT NULL,
+  price INT NOT NULL,
   stock_quantity INT,
-  product_sales DEC(10,2) DEFAULT 0,
+  product_sales DEC(10,2),
   PRIMARY KEY (item_id)
 );
-
-SELECT * FROM products;
 
 INSERT INTO products (product_name, department_name, price, stock_quantity)
 VALUES	('20oz. Hammer', 'Tools', 10.00, 30),
@@ -26,3 +24,5 @@ VALUES	('20oz. Hammer', 'Tools', 10.00, 30),
         ('Sun Glasses', 'Apparel', 7.00, 40),
         ('52-inch Ceiling Fan Brushed Nickel Finish w/3 Blades', 'Home Improvement', 100.00, 45),
         ('Bomber Jacket Slim Fit Lined', 'Apparel', 100.00, 15);
+
+SELECT * FROM products;

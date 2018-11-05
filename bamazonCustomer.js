@@ -1,6 +1,6 @@
 const mysql = require('mysql');
 const inquirer = require('inquirer');
-const table = require('console.table');
+const cTable = require('console.table');
 
 // create the connection information for the sql database
 const connection = mysql.createConnection({
@@ -35,7 +35,7 @@ function display() {
         console.table(res);
         // once you have the items, prompt the user for which they'd like to buy
         start();
-    })
+    });
 }
 
 function start() {
@@ -44,14 +44,14 @@ function start() {
             type: 'input',
             name: 'id',
             message: 'What is the ITEM_ID of the product you would like to buy?',
-            validate: (answer)=>{
+            validate: (answers) => {
                 // Inquirer preferred way with promise to validate value
                 return new Promise((resolve, reject) => {
                     connection.query('SELECT item_id FROM products', (err, res) => {
                         if (err) throw err;
                         let flag = false;
                         for (let i in res) {
-                            if (res[i].item_id == answer) {
+                            if (res[i].item_id === parseInt(answers)) {
                                 flag = true;
                                 break;
                             }
@@ -62,69 +62,69 @@ function start() {
                         else {
                             reject('ITEM_ID does not exist');
                         }
-                    })
-                })
+                    });
+                });
             }
         },
         {
             type: 'input',
-            name: 'quantity',
+            name: 'qty',
             message: 'How many units would you like?',
-            validate: (answer)=> {
+            validate: (answers) => {
                 return new Promise((resolve, reject) => {
-                    if (typeof answer === 'number') {
+                    if (isNaN(parseInt(answers))) {
                         reject('Not a valid quantity');
                     }
                     else {
                         resolve(true);
                     }
-                })
+                });
             }
         }
-    ]).then((answer) => {
+    ]).then(answers => {
         connection.query('SELECT * FROM products WHERE ?',
-            {
-                item_id: answer.id
-            },
+            [{
+                item_id: answers.id
+            }],
             (err, res) => {
                 if (err) throw err;
                 let oldStock = res[0].stock_quantity;
-                let newStock = oldStock - answer.quantity;
-                let oldPurchased = res[0].product_sales;
-                let purchased = answer.quantity * res[0].price;
+                let newStock = oldStock - answers.qty;
+                let oldPurchased = parseFloat(res[0].product_sales);
+                let purchased = parseFloat(answers.qty * res[0].price);
                 if (newStock > -1) {
                     connection.query('UPDATE products SET ? WHERE ?',
                         [{
                             stock_quantity: newStock
                         },
                         {
-                            item_id: answer.id
+                            item_id: answers.id
                         }],
                         (err, res) => {
                             if (err) throw err;
                             console.log('Item purchased!')
-                            let newPurchased = parseInt(oldPurchased) + parseInt(purchased);
+                            let newPurchased = oldPurchased + purchased;
                             connection.query('UPDATE products SET ? WHERE ?',
                                 [{
                                     product_sales: newPurchased
                                 },
                                 {
-                                    item_id: answer.id
+                                    item_id: answers.id
                                 }],
                                 (err, res) => {
                                     if (err) throw err;
                                     console.log('Sales Updated');
                                     display();
                                 }
-                            )
+                            );
                         }
-                    )
+                    );
                 }
                 else {
                     console.log('Insufficient quantity!');
                     display();
                 }
             }
-        )
+        );
     });
 }
