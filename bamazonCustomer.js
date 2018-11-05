@@ -11,7 +11,7 @@ const connection = mysql.createConnection({
     port: process.env.PORT || 3306,
 
     // Your username; if not root
-    user: proccess.env.USER || 'root',
+    user: process.env.USER || 'root',
 
     // Your password; if not default
     password: process.env.PWD || '',
