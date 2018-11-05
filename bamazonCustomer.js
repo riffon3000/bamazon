@@ -45,7 +45,7 @@ function start() {
             type: 'input',
             name: 'id',
             message: 'What is the ITEM_ID of the product you would like to buy?',
-            validate: (answer) => {
+            validate: (answer)=>{
                 // Inquirer preferred way with promise to validate value
                 return new Promise((resolve, reject) => {
                     connection.query('SELECT item_id FROM products', (err, res) => {
@@ -71,23 +71,13 @@ function start() {
             type: 'input',
             name: 'quantity',
             message: 'How many units would you like?',
-            validate: (answer) => {
-                let input = answer;
+            validate: (answer)=> {
                 return new Promise((resolve, reject) => {
-                    let check = isNaN(input);
-                    let flag = false;
-                    if (check) {
-                        flag = false;
-                    }
-                    else {
-                        flag = true;
-                    }
-
-                    if (flag) {
-                        resolve(true);
-                    }
-                    else {
+                    if (typeof answer === 'number') {
                         reject('Not a valid quantity');
+                    }
+                    else {
+                        resolve(true);
                     }
                 })
             }
@@ -97,13 +87,13 @@ function start() {
             {
                 item_id: answer.id
             },
-            (err, results, fields) => {
+            (err, res) => {
                 if (err) throw err;
-                let oldStock = results[0].stock_quantity;
+                let oldStock = res[0].stock_quantity;
                 let newStock = oldStock - answer.quantity;
-                let oldPurchased = results[0].product_sales;
-                let purchased = answer.quantity * results[0].price;
-                if (newStock > 0) {
+                let oldPurchased = res[0].product_sales;
+                let purchased = answer.quantity * res[0].price;
+                if (newStock > -1) {
                     connection.query('UPDATE products SET ? WHERE ?',
                         [{
                             stock_quantity: newStock
@@ -111,7 +101,7 @@ function start() {
                         {
                             item_id: answer.id
                         }],
-                        (err, results, fields) => {
+                        (err, res) => {
                             if (err) throw err;
                             console.log('Item purchased!')
                             let newPurchased = parseInt(oldPurchased) + parseInt(purchased);
@@ -122,7 +112,7 @@ function start() {
                                 {
                                     item_id: answer.id
                                 }],
-                                (err, results, fields) => {
+                                (err, res) => {
                                     if (err) throw err;
                                     console.log('Sales Updated');
                                     display();
