@@ -5,19 +5,19 @@ const table = require('console.table');
 
 // create the connection information for the sql database
 const connection = mysql.createConnection({
-    host: process.env.HOST || 'localhost',
+    host: 'localhost',
 
     // Your port; if not 3306
-    port: process.env.PORT || 3306,
+    port: 3306,
 
     // Your username; if not root
-    user: process.env.USER || 'root',
+    user: 'root',
 
     // Your password; if not default
-    password: process.env.PWD || '',
+    password: 'root',
 
     //   Your database; if not bamazon
-    database: process.env.DB || 'bamazon'
+    database: 'bamazon'
 });
 
 // connect to the mysql server and sql database
@@ -33,7 +33,7 @@ function display() {
     connection.query('SELECT * FROM products', (err, res) => {
         if (err) throw err;
         // display product items
-        table(res);
+        console.table(res);
         // once you have the items, prompt the user for which they'd like to buy
         start();
     })
